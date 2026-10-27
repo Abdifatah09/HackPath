@@ -442,7 +442,7 @@ const CLIPS = {
   async tour(s) {
     await card(s, TITLE, 2400, { first: true });
 
-    await caption(s, "Sign up", "Create an account and you're straight in. <em>No email codes.</em>");
+    await caption(s, "Sign up", "Create an account and you're <em>straight in</em>");
     await click(s, s.app.getByRole("textbox", { name: /name/i }).or(s.app.locator("input[placeholder=Name]")));
     await type(s, "Sam Carter", 55);
     await click(s, "input[placeholder=Email]"); await type(s, "sam@example.com", 40);
