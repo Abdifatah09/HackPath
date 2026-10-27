@@ -1,0 +1,12 @@
+{
+  "name": "hackpath-promo",
+  "private": true,
+  "description": "Records the screenshots, GIFs and videos in docs/ from a local HackPath filled with demo data.",
+  "scripts": {
+    "record": "node record.mjs"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "5.2.0",
+    "playwright-core": "1.62.1"
+  }
+}

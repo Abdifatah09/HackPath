@@ -26,9 +26,7 @@ export default function Navbar() {
       isActive ? "text-white" : "text-white/80 hover:text-white"
     }`;
 
-  const hideNavbar =
-    location.pathname === "/verify-email" ||
-    location.pathname === "/reset-password";
+  const hideNavbar = location.pathname === "/reset-password";
 
   if (hideNavbar) return null;
 

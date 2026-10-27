@@ -84,12 +84,6 @@ export default function Login() {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        <p className="text-sm mt-3">
-          <Link className="underline" to="/forgot-password">
-            Forgot password?
-          </Link>
-        </p>
-
         <p className="text-sm mt-4">
           Don’t have an account?{" "}
           <Link className="underline" to="/register">

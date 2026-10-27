@@ -1,0 +1,4 @@
+scripts/promo/node_modules/
+# videos are for posting, not the repo; the GIFs in docs/media are what the README shows
+docs/media/*.mp4
+docs/media/teaser.gif

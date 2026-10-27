@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { isValidEmail, validatePassword } from "../utils/validators";
 
 export default function ForgotPassword() {
-  const { forgotpassword, resetpassword, setPendingVerifyEmail } = useAuth();
+  const { forgotpassword, resetpassword } = useAuth();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1); 
@@ -56,8 +56,6 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      setPendingVerifyEmail(email.trim());
-
       await forgotpassword(email.trim());
       setMsg("If the email exists, a reset code has been sent to your email.");
       setStep(2);

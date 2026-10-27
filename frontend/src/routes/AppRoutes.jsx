@@ -7,7 +7,6 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 import Profile from "../pages/Profile";
-import VerifyEmail from "../pages/VerifyEmail";
 import AdminRoute from "./AdminRoute";
 import AdminCurriculum from "../pages/AdminCurriculum";
 import Home from "../pages/Home";
@@ -34,7 +33,6 @@ export default function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/" element={<Home />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
 
       <Route 
         path="/progress" 
