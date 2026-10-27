@@ -9,21 +9,6 @@ export function AuthProvider({ children }) {
   const [stats, setStats] = useState(null); 
   const [isReady, setIsReady] = useState(false);
 
-  const [pendingVerifyEmail, setPendingVerifyEmailState] = useState(
-    localStorage.getItem("pendingVerifyEmail") || ""
-  );
-
-  const setPendingVerifyEmail = (email) => {
-    const value = email || "";
-    setPendingVerifyEmailState(value);
-    if (value) localStorage.setItem("pendingVerifyEmail", value);
-    else localStorage.removeItem("pendingVerifyEmail");
-  };
-
-  const clearPendingVerifyEmail = () => {
-    setPendingVerifyEmail("");
-  };
-
   const refreshStats = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) return null;
@@ -59,9 +44,7 @@ export function AuthProvider({ children }) {
     setStats(null); 
   };
 
-  const login = async (email, password) => {
-    const data = await authService.login({ email, password });
-
+  const startSession = async (data) => {
     const accessToken = data.accessToken || data.token;
     const refreshToken = data.refreshToken;
 
@@ -71,10 +54,14 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const login = async (email, password) => {
+    const data = await authService.login({ email, password });
+    return startSession(data);
+  };
+
   const register = async (payload) => {
-    const res = await authService.register(payload);
-    setPendingVerifyEmail(payload?.email || res?.email || "");
-    return res;
+    const data = await authService.register(payload);
+    return startSession(data);
   };
 
   const logout = async () => {
@@ -86,18 +73,11 @@ export function AuthProvider({ children }) {
   };
 
   const forgotpassword = async (email) => {
-    setPendingVerifyEmail(email);
     return authService.forgotPassword({ email });
   };
 
   const resetpassword = async (payload) => {
     return authService.resetPassword(payload);
-  };
-
-  const verifyEmail = async ({ email, code }) => {
-    const res = await authService.verifyEmail({ email, code });
-    clearPendingVerifyEmail();
-    return res;
   };
 
   useEffect(() => {
@@ -130,11 +110,6 @@ export function AuthProvider({ children }) {
 
         forgotpassword,
         resetpassword,
-
-        pendingVerifyEmail,
-        setPendingVerifyEmail,
-        clearPendingVerifyEmail,
-        verifyEmail,
 
         refreshStats, // ✅ expose helpers
         updateStats,

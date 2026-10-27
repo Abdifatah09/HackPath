@@ -33,22 +33,6 @@ const User = sequelize.define(
       defaultValue: "student",
     },
 
-    isEmailVerified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
-
-    emailVerificationCodeHash: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    emailVerificationExpiresAt: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
     passwordResetCodeHash: {
       type: DataTypes.STRING,
       allowNull: true,

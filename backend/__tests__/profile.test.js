@@ -14,8 +14,7 @@ jest.mock("../models", () => ({
 }));
 
 jest.mock("../utils/emailService", () => ({
-  sendOtpEmail: jest.fn(),
-  sendWelcomeEmail: jest.fn()
+  sendOtpEmail: jest.fn()
 }));
 
 jest.mock("../utils/tokenUtils", () => ({
@@ -60,7 +59,9 @@ describe("Auth routes", () => {
 
     expect(res.statusCode).toBe(201);
     expect(User.create).toHaveBeenCalled();
-    expect(res.body.email).toBe("test@test.com");
+    expect(res.body.user.email).toBe("test@test.com");
+    expect(res.body.accessToken).toBe("fakeAccessToken");
+    expect(RefreshToken.create).toHaveBeenCalled();
   });
 
 
@@ -87,8 +88,7 @@ describe("Auth routes", () => {
       email: "test@test.com",
       name: "Test User",
       role: "student",
-      passwordHash: "hashedPassword",
-      isEmailVerified: true
+      passwordHash: "hashedPassword"
     });
 
     bcrypt.compare.mockResolvedValue(true);
@@ -109,8 +109,7 @@ describe("Auth routes", () => {
   it("should reject invalid password", async () => {
 
     User.findOne.mockResolvedValue({
-      passwordHash: "hashedPassword",
-      isEmailVerified: true
+      passwordHash: "hashedPassword"
     });
 
     bcrypt.compare.mockResolvedValue(false);
@@ -125,24 +124,5 @@ describe("Auth routes", () => {
     expect(res.statusCode).toBe(401);
   });
 
-
-  it("should reject unverified email", async () => {
-
-    User.findOne.mockResolvedValue({
-      passwordHash: "hashedPassword",
-      isEmailVerified: false
-    });
-
-    bcrypt.compare.mockResolvedValue(true);
-
-    const res = await request(app)
-      .post("/auth/login")
-      .send({
-        email: "test@test.com",
-        password: "Password123"
-      });
-
-    expect(res.statusCode).toBe(403);
-  });
 
 });

@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const { User, Profile, RefreshToken } = require('../models');
-const { sendOtpEmail, sendWelcomeEmail } = require("../utils/emailService");
+const { sendOtpEmail } = require("../utils/emailService");
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -34,33 +34,23 @@ exports.register = async (req, res) => {
       passwordHash,
       name,
       role: role || "student",
-      isEmailVerified: false,
     });
 
-    const code = generate6DigitCode();
-    const expires = new Date(Date.now() + 10 * 60 * 1000);
+    const refreshTokenStr = generateRefreshToken();
 
-    await user.update({
-      emailVerificationCodeHash: hashCode(code),
-      emailVerificationExpiresAt: expires,
+    await RefreshToken.create({
+      userId: user.id,
+      token: refreshTokenStr,
+      expiresAt: refreshTokenExpiryDate()
     });
 
-    let emailSent = true;
-
-    try {
-      await sendOtpEmail(user.email, code, "VERIFY_EMAIL");
-    } catch (emailErr) {
-      emailSent = false;
-      console.error("OTP email failed:", emailErr.message);
-      
-    }
+    const accessToken = generateAccessToken(user);
 
     return res.status(201).json({
-      message: emailSent
-        ? "Registered successfully. Verification code sent to your email."
-        : "Registered successfully. Unable to send verification email right now. Please try resending the code.",
-      email: user.email,
-      emailSent,
+      message: "Registered successfully",
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+      accessToken,
+      refreshToken: refreshTokenStr,
     });
 
   } catch (err) {
@@ -79,10 +69,6 @@ exports.login = async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return res.status(401).json({ message: "Invalid credentials" });
-
-    if (!user.isEmailVerified) {
-      return res.status(403).json({ message: "Please verify your email before logging in." });
-    }
 
     const refreshTokenStr = generateRefreshToken();
 
@@ -238,8 +224,8 @@ exports.forgotPassword = async (req, res) => {
 
     return res.status(201).json({
       message: emailSent
-        ? "Registered successfully. Verification code sent to your email."
-        : "Registered successfully. Unable to send verification email right now. Please try resending the code.",
+        ? "If the email exists, a reset code has been sent."
+        : "Unable to send the reset email right now. Please try again later.",
       email: user.email,
       emailSent,
     });
@@ -291,49 +277,3 @@ exports.resetPassword = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
-
-exports.verifyEmailCode = async (req, res) => {
-  try {
-    const { email, code } = req.body;
-
-    if (!email || !code) {
-      return res.status(400).json({ message: "email and code are required" });
-    }
-
-    const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(400).json({ message: "Invalid code" });
-
-    if (user.isEmailVerified) {
-      return res.json({ message: "Email already verified." });
-    }
-
-    if (
-      !user.emailVerificationCodeHash ||
-      !user.emailVerificationExpiresAt ||
-      new Date(user.emailVerificationExpiresAt) < new Date()
-    ) {
-      return res.status(400).json({ message: "Code expired. Please request a new code." });
-    }
-
-    const ok = user.emailVerificationCodeHash === hashCode(code);
-    if (!ok) return res.status(400).json({ message: "Invalid code" });
-
-    await user.update({
-      isEmailVerified: true,
-      emailVerificationCodeHash: null,
-      emailVerificationExpiresAt: null,
-    });
-
-    try {
-     await sendWelcomeEmail(user.email, user.name);
-    } catch (emailErr) {
-      console.error("Welcome email failed:", emailErr.message);
-    }
-
-    return res.json({ message: "Email verified successfully. You can now login." });
-  } catch (err) {
-    console.error("verifyEmailCode error:", err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-

@@ -43,7 +43,7 @@ export default function Register() {
         password,
         role: "student", 
       });
-      navigate("/verify-email");
+      navigate("/dashboard");
     } catch (error) {
       setErr(error?.response?.data?.message || "Registration failed");
     } finally {
@@ -56,7 +56,7 @@ export default function Register() {
       <div className="w-full max-w-md bg-white border rounded-2xl shadow p-6">
         <h1 className="text-2xl font-semibold mb-1">Create an account</h1>
         <p className="text-sm text-gray-600 mb-4">
-          Register and we’ll send you a verification code by email.
+          Create an account and start your first challenge.
         </p>
 
         {err && (

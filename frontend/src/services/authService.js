@@ -8,5 +8,4 @@ export const authService = {
   logout: () => api.post("/auth/logout").then(r => r.data),
   forgotPassword: (payload) => api.post("/auth/forgot-password", payload).then(r => r.data),
   resetPassword: (payload) => api.post("/auth/reset-password", payload).then(r => r.data),
-  verifyEmail: (payload) => api.post("/auth/verify-email", payload).then(r => r.data),
 };
